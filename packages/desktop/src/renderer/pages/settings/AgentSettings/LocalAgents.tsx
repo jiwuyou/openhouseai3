@@ -25,6 +25,7 @@ import {
   getAgentAvailabilityFilterStats,
   type AgentAvailabilityFilter,
 } from './agentFilters';
+import { brandDisplayText } from '@/renderer/utils/brand';
 
 const LOCAL_AGENT_SETUP_GUIDE_URL = 'https://github.com/iOfficeAI/AionUi/wiki/ACP-Setup';
 
@@ -111,7 +112,7 @@ const LocalAgents: React.FC = () => {
     if (leftIsAionrs !== rightIsAionrs) {
       return leftIsAionrs ? -1 : 1;
     }
-    return left.name.localeCompare(right.name);
+    return brandDisplayText(left.name).localeCompare(brandDisplayText(right.name));
   });
   const officialFilterStats = getAgentAvailabilityFilterStats(sortedOfficialAgents);
   const visibleOfficialAgents = filterAgentsByAvailability(sortedOfficialAgents, agentFilter);
@@ -140,10 +141,10 @@ const LocalAgents: React.FC = () => {
         await refreshCatalog();
         switch (result.status) {
           case 'online':
-            Message.success(t('settings.agentManagement.testConnectionOnline', { name: result.name }));
+            Message.success(t('settings.agentManagement.testConnectionOnline', { name: brandDisplayText(result.name) }));
             break;
           case 'missing':
-            Message.warning(t('settings.agentManagement.testConnectionMissing', { name: result.name }));
+            Message.warning(t('settings.agentManagement.testConnectionMissing', { name: brandDisplayText(result.name) }));
             break;
           case 'offline':
             // auth_required is offline-with-a-reason: surface the diagnostic
@@ -151,8 +152,8 @@ const LocalAgents: React.FC = () => {
             Message.warning(
               formatManagedAgentDiagnosticMessage(t, result) ||
                 (result.last_check_error_code === 'auth_required'
-                  ? t('settings.agentManagement.testConnectionAuth', { name: result.name })
-                  : t('settings.agentManagement.testConnectionOffline', { name: result.name }))
+                  ? t('settings.agentManagement.testConnectionAuth', { name: brandDisplayText(result.name) })
+                  : t('settings.agentManagement.testConnectionOffline', { name: brandDisplayText(result.name) }))
             );
             break;
           default:

@@ -16,6 +16,7 @@
  *   AIONUI_STATIC_DIR     : override static dir (default out/renderer)
  *   AIONUI_BACKEND_BIN    : absolute path to aioncore binary (else PATH lookup)
  *   AIONUI_BACKEND_BUNDLED_DIR : dir containing bundled-aioncore/<plat-arch>/binary
+ *   AIONUI_BUILTIN_ASSISTANTS_PATH : override aioncore built-in assistants
  *   AIONUI_OPEN_BROWSER   : "1"/"true" to force open, "0"/"false" to disable
  */
 
@@ -37,6 +38,7 @@ const BACKEND_BINARY = process.platform === 'win32' ? 'aioncore.exe' : 'aioncore
 
 const __filename = fileURLToPath(import.meta.url);
 const repoRoot = path.resolve(path.dirname(__filename), '..');
+const OPENHOUSEAI_BUILTIN_ASSISTANTS_DIR = 'openhouseai-builtin-assistants';
 
 const args = process.argv.slice(2);
 const has = (name: string): boolean => args.includes(name);
@@ -157,6 +159,20 @@ function resolveBackendBinary(): string {
   );
 }
 
+function configureBuiltinAssistantsPath(): string | undefined {
+  if (process.env.AIONUI_BUILTIN_ASSISTANTS_PATH) {
+    return process.env.AIONUI_BUILTIN_ASSISTANTS_PATH;
+  }
+
+  const candidate = path.join(repoRoot, 'resources', OPENHOUSEAI_BUILTIN_ASSISTANTS_DIR);
+  if (!fs.existsSync(path.join(candidate, 'assistants.json'))) {
+    return undefined;
+  }
+
+  process.env.AIONUI_BUILTIN_ASSISTANTS_PATH = candidate;
+  return candidate;
+}
+
 /**
  * Prepend all nvm-managed Node bin dirs to PATH. Electron's main process does
  * this (see packages/desktop/src/index.ts), otherwise CLI tools installed under
@@ -217,10 +233,12 @@ async function main(): Promise<void> {
   const staticDir = resolveStaticDir();
   const backendBin = resolveBackendBinary();
   const logDir = process.env.AIONUI_LOG_DIR ?? path.join(workDir, 'logs');
+  const builtinAssistantsPath = configureBuiltinAssistantsPath();
 
   console.log('[webui] work dir   :', workDir);
   console.log('[webui] static dir :', staticDir);
   console.log('[webui] backend bin:', backendBin);
+  if (builtinAssistantsPath) console.log('[webui] assistants :', builtinAssistantsPath);
   console.log(`[webui] launching  : port=${port} allowRemote=${allowRemote}`);
 
   const handle = await startWebHost({

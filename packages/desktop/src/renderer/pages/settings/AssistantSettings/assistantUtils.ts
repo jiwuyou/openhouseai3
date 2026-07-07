@@ -1,5 +1,7 @@
 import { resolveExtensionAssetUrl } from '@/renderer/utils/platform';
 import { isBackendRelativeAssetPath, isLikelyLocalFilePath } from '@/renderer/utils/model/assistantAvatar';
+import { resolveAssistantName } from '@/renderer/utils/model/assistantDisplay';
+import { brandDisplayText } from '@/renderer/utils/brand';
 import type { AssistantListItem, AvailableBackend } from './types';
 import type { ManagedAgent } from '@/renderer/utils/model/agentTypes';
 
@@ -111,7 +113,7 @@ export const filterAssistants = (
   return assistants.filter((assistant) => {
     if (normalizedQuery) {
       const searchableText = [
-        assistant.name_i18n?.[localeKey] || assistant.name,
+        resolveAssistantName(assistant, localeKey, assistant.name),
         assistant.description_i18n?.[localeKey] || assistant.description || '',
       ]
         .join(' ')
@@ -207,7 +209,7 @@ export const buildAssistantEditorBackends = (
 
     backendMap.set(agentId, {
       id: agentId,
-      name: agent.name_i18n?.[localeKey] || agent.name,
+      name: brandDisplayText(agent.name_i18n?.[localeKey] || agent.name),
       runtimeKey,
       isExtension: agent.isExtension,
       // Prefer the agent's own avatar/icon; the dropdown falls back to the logo

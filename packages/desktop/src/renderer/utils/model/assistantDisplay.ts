@@ -5,6 +5,7 @@
  */
 
 import type { Assistant } from '@/common/types/agent/assistantTypes';
+import { brandDisplayText } from '@/renderer/utils/brand';
 
 type AssistantNameSource = Pick<Assistant, 'id' | 'name' | 'name_i18n'>;
 
@@ -18,5 +19,5 @@ export function resolveAssistantName(
   }
 
   const localizedName = assistant.name_i18n?.[localeKey] || assistant.name_i18n?.['en-US'];
-  return localizedName?.trim() || assistant.name?.trim() || assistant.id || fallback;
+  return brandDisplayText(localizedName?.trim() || assistant.name?.trim() || assistant.id || fallback);
 }

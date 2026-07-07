@@ -12,6 +12,7 @@ import { AionSearchInput } from '@/renderer/components/base';
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { resolveAssistantAvatar } from '@/renderer/utils/model/assistantAvatar';
 import { selectableAssistants } from '@/renderer/utils/model/assistantSelection';
+import { brandDisplayText } from '@/renderer/utils/brand';
 import { useTranslation } from 'react-i18next';
 
 export function resolveAssistantVisibleLimit(width: number): number {
@@ -115,7 +116,7 @@ const AssistantSelectionArea: React.FC<AssistantSelectionAreaProps> = ({
     const query = search.trim().toLowerCase();
     if (!query) return overflowAssistants;
     return overflowAssistants.filter((assistant) => {
-      const label = assistant.name_i18n?.[localeKey] || assistant.name;
+      const label = brandDisplayText(assistant.name_i18n?.[localeKey] || assistant.name);
       return label.toLowerCase().includes(query);
     });
   }, [localeKey, overflowAssistants, search]);
@@ -125,7 +126,7 @@ const AssistantSelectionArea: React.FC<AssistantSelectionAreaProps> = ({
   const renderAssistantPill = (assistant: Assistant, testId: string) => {
     const avatar = resolveAssistantAvatar(assistant.avatar);
     const isSelected = selectedId === assistant.id;
-    const label = assistant.name_i18n?.[localeKey] || assistant.name;
+    const label = brandDisplayText(assistant.name_i18n?.[localeKey] || assistant.name);
 
     return (
       <Button

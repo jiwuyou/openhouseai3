@@ -9,6 +9,7 @@ import { Badge, Typography } from '@arco-design/web-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import FeedbackButton from '@/renderer/components/base/FeedbackButton';
+import { brandDisplayText } from '@/renderer/utils/brand';
 
 const { Text } = Typography;
 
@@ -24,7 +25,7 @@ const MessageAgentStatus: React.FC<MessageAgentStatusProps> = ({ message }) => {
   const { backend, status, agent_name } = message.content;
 
   // Resolve display name: explicit agent_name > capitalized backend.
-  const display_name = agent_name || backend.charAt(0).toUpperCase() + backend.slice(1);
+  const display_name = brandDisplayText(agent_name || backend.charAt(0).toUpperCase() + backend.slice(1));
 
   // Hide disconnected status from historical messages (no longer emitted but may exist in DB)
   if ((status as string) === 'disconnected') return null;

@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { ipcBridge } from '@/common';
 import { configService } from '@/common/config/configService';
 import { isElectronDesktop } from '@/renderer/utils/platform';
+import { APP_BRAND_NAME } from '@/renderer/utils/brand';
 import { createBrowserNotificationController, type NotificationPermissionState } from './browserNotificationCore';
 
 /**
@@ -49,7 +50,7 @@ export const useBrowserNotification = (): void => {
           : t('settings.browserNotification.bodyTurnCompleted'),
       show: ({ body, conversationId }) => {
         try {
-          const notification = new Notification('AionUi', { body });
+          const notification = new Notification(APP_BRAND_NAME, { body });
           notification.onclick = () => {
             window.focus();
             if (conversationId) void navigate(`/conversation/${conversationId}`);

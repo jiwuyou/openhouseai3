@@ -86,6 +86,13 @@ if (!fs.existsSync(backendSrc)) {
 fs.mkdirSync(path.dirname(backendDest), { recursive: true });
 fs.cpSync(backendSrc, backendDest, { recursive: true });
 
+// 7b. Copy openhouseai built-in assistant overrides for the Web runtime.
+const builtinAssistantsSrc = path.join(projectRoot, 'resources/openhouseai-builtin-assistants');
+if (fs.existsSync(path.join(builtinAssistantsSrc, 'assistants.json'))) {
+  const builtinAssistantsDest = path.join(tarballContentDir, 'openhouseai-builtin-assistants');
+  fs.cpSync(builtinAssistantsSrc, builtinAssistantsDest, { recursive: true });
+}
+
 // 8. Create tarball
 fs.mkdirSync(distDir, { recursive: true });
 execSync(`tar -czf ${path.basename(tarballPath)} -C ${stagingDir} aionui-web`, {

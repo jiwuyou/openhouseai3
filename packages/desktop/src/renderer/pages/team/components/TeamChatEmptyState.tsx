@@ -9,6 +9,7 @@ import { usePresetAssistantInfo } from '@renderer/hooks/agent/usePresetAssistant
 import { resolveConversationBackend } from '@/renderer/pages/conversation/utils/conversationAssistantIdentity';
 import { useTeammateColor } from '../identity/TeamIdentityContext';
 import { Robot } from '@icon-park/react';
+import { brandDisplayText } from '@/renderer/utils/brand';
 
 const useAcpDraft = getSendBoxDraftHook('acp', { _type: 'acp', atPath: [], content: '', uploadFile: [] });
 const useAionrsDraft = getSendBoxDraftHook('aionrs', { _type: 'aionrs', atPath: [], content: '', uploadFile: [] });
@@ -45,15 +46,15 @@ const resolveAssistantName = (
   presetName: string | null,
   explicitAssistantName?: string
 ): string => {
-  if (presetName) return presetName;
+  if (presetName) return brandDisplayText(presetName);
   const trimmedExplicitName = explicitAssistantName?.trim();
-  if (trimmedExplicitName) return trimmedExplicitName;
+  if (trimmedExplicitName) return brandDisplayText(trimmedExplicitName);
   const extraAgentName = (conversation.extra as { agent_name?: string } | undefined)?.agent_name;
-  if (extraAgentName && extraAgentName.trim()) return extraAgentName.trim();
+  if (extraAgentName && extraAgentName.trim()) return brandDisplayText(extraAgentName.trim());
   // conversation.name is typically "teamName - agentRole"
   const segments = conversation.name?.split(' - ') ?? [];
   const role = segments[segments.length - 1]?.trim();
-  if (role) return role;
+  if (role) return brandDisplayText(role);
   return 'Leader';
 };
 

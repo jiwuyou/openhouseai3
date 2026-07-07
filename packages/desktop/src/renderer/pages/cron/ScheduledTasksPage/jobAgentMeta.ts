@@ -9,6 +9,7 @@ import type { AgentLogoMap } from '@renderer/utils/model/agentLogo';
 import { resolveAgentLogo } from '@renderer/utils/model/agentLogo';
 import { resolveAssistantAvatar } from '@renderer/utils/model/assistantAvatar';
 import type { Assistant } from '@/common/types/agent/assistantTypes';
+import { brandDisplayText } from '@/renderer/utils/brand';
 
 function normalizeAgentBackend(agent: string | undefined): string | undefined {
   if (!agent) return undefined;
@@ -39,7 +40,7 @@ export function getJobAgentMeta(
     }
 
     const rawType = normalizeAgentBackend(job.metadata.agent_type);
-    const displayName = assistant.name || rawType;
+    const displayName = brandDisplayText(assistant.name || rawType);
     const avatar = resolveAssistantAvatar(assistant.avatar);
     if (avatar.kind === 'image') {
       return { name: displayName, logo: avatar.value };
@@ -57,13 +58,13 @@ export function getJobAgentMeta(
 
   if (rawType === 'acp') {
     return {
-      name: config?.name || rawType,
+      name: brandDisplayText(config?.name || rawType),
       logo: resolveAgentLogo(logos, { backend: logoBackend }),
     };
   }
 
   return {
-    name: config?.name || rawType,
+    name: brandDisplayText(config?.name || rawType),
     logo: resolveAgentLogo(logos, { backend: logoBackend }),
   };
 }

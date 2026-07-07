@@ -13,6 +13,7 @@ import { resolveLocaleKey } from '@/common/utils';
 import type { AgentLogoMap } from '@/renderer/utils/model/agentLogo';
 import { resolveAgentLogo, useAgentLogos } from '@/renderer/utils/model/agentLogo';
 import { isLikelyLocalFilePath, resolveAssistantAvatar } from '@/renderer/utils/model/assistantAvatar';
+import { brandDisplayText } from '@/renderer/utils/brand';
 import useSWR from 'swr';
 export interface PresetAssistantInfo {
   name: string;
@@ -213,7 +214,9 @@ function hasMatchingEnabledSkills(candidateSkills: string[] | undefined, enabled
  */
 function buildPresetInfoFromAssistant(assistant: Assistant, locale: string): PresetAssistantInfo {
   const localeKey = resolveLocaleKey(locale);
-  const name = assistant.name_i18n?.[localeKey] || assistant.name_i18n?.[locale] || assistant.name || assistant.id;
+  const name = brandDisplayText(
+    assistant.name_i18n?.[localeKey] || assistant.name_i18n?.[locale] || assistant.name || assistant.id
+  );
   const avatar = typeof assistant.avatar === 'string' ? assistant.avatar : '';
   const normalized = normalizeAvatar(avatar);
   return {
@@ -227,11 +230,29 @@ function buildPresetInfoFromAssistant(assistant: Assistant, locale: string): Pre
 }
 
 function buildPresetInfoFromConversationAssistant(
-  assistant: NonNullable<TChatConversation['assistant']>
+  assistant: NonNullable<TChatConversation['assistant']>,
+  logos: AgentLogoMap
 ): PresetAssistantInfo {
   const normalized = normalizeAvatar(assistant.avatar);
+  const isUnresolvedSvgFallback =
+    normalized.isEmoji &&
+    typeof assistant.avatar === 'string' &&
+    assistant.avatar.trim().toLowerCase().endsWith('.svg');
+  const isEmptyAvatarFallback = normalized.isEmoji && (!assistant.avatar || assistant.avatar.trim().length === 0);
+  if (isUnresolvedSvgFallback || isEmptyAvatarFallback) {
+    const backendLogo = resolveAgentLogo(logos, { backend: assistant.backend });
+    if (backendLogo) {
+      return {
+        name: brandDisplayText(assistant.name),
+        logo: backendLogo,
+        isEmoji: false,
+        backend: assistant.backend,
+        assistantId: assistant.id,
+      };
+    }
+  }
   return {
-    name: assistant.name,
+    name: brandDisplayText(assistant.name),
     logo: normalized.logo,
     isEmoji: normalized.isEmoji,
     isFallback: normalized.isFallback,
@@ -320,7 +341,7 @@ export function usePresetAssistantInfo(conversation: TChatConversation | undefin
       }
 
       return {
-        info: buildPresetInfoFromConversationAssistant(conversation.assistant),
+        info: buildPresetInfoFromConversationAssistant(conversation.assistant, logos),
         isLoading: false,
       };
     }

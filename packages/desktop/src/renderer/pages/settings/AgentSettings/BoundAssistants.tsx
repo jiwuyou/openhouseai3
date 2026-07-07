@@ -9,6 +9,7 @@ import type { Assistant } from '@/common/types/agent/assistantTypes';
 import { resolveLocaleKey } from '@/common/utils';
 import AssistantAvatar from '@/renderer/pages/settings/AssistantSettings/AssistantAvatar';
 import type { ManagedAgent } from '@/renderer/utils/model/agentTypes';
+import { resolveAssistantName } from '@/renderer/utils/model/assistantDisplay';
 import { Right } from '@icon-park/react';
 import { Tooltip, Typography } from '@arco-design/web-react';
 import React from 'react';
@@ -35,7 +36,7 @@ export const useAssistantsForAgents = (): { assistants: Assistant[]; isLoading: 
 };
 
 const assistantLabel = (assistant: Assistant, localeKey: string): string =>
-  assistant.name_i18n?.[localeKey] || assistant.name;
+  resolveAssistantName(assistant, localeKey, assistant.name);
 
 /**
  * Compact overlapping avatar stack shown on an agent list row to surface which

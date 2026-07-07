@@ -6,6 +6,7 @@
 
 import { ipcBridge } from '@/common';
 import type { TFunction } from 'i18next';
+import { brandDisplayText } from '@/renderer/utils/brand';
 
 /**
  * SWR key for the Agent settings management view (`/api/agents/management`).
@@ -189,6 +190,8 @@ export function formatManagedAgentDiagnosticMessage(t: TFunction, agent: Managed
   const details = getAgentManagementErrorDetails(agent.last_check_error_details);
   const command = details.command || agent.command || agent.backend || agent.name;
   const resource = details.resource || agent.backend || agent.name;
+  const displayName = brandDisplayText(agent.name);
+  const displayBackend = brandDisplayText(agent.backend || details.backend || agent.name);
 
   switch (agent.last_check_error_code) {
     case 'command_not_found':
@@ -207,8 +210,8 @@ export function formatManagedAgentDiagnosticMessage(t: TFunction, agent: Managed
     case 'disabled':
     case 'no_command':
       return t(`settings.agentManagement.errorCodes.${agent.last_check_error_code}`, {
-        name: agent.name,
-        backend: agent.backend || details.backend || agent.name,
+        name: displayName,
+        backend: displayBackend,
         defaultValue: fallback,
       });
     case 'managed_runtime_unavailable':
