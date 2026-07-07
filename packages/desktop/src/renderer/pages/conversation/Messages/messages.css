@@ -46,4 +46,65 @@
   .message-item .whitespace-pre-wrap {
     line-height: 1.4 !important;
   }
+
+  .message-permission-card {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .message-permission-card .arco-card-body {
+    padding: 12px !important;
+  }
+
+  .message-permission-card .arco-typography,
+  .message-permission-card code {
+    max-width: 100%;
+  }
+
+  .message-permission-choice-list {
+    width: 100%;
+    display: flex !important;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .message-permission-choice {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .message-permission-choice .arco-radio {
+    width: 100%;
+    min-height: 42px;
+    align-items: flex-start;
+    padding: 9px 10px;
+    border: 1px solid var(--color-border-2);
+    border-radius: 8px;
+    background: var(--color-fill-1);
+    box-sizing: border-box;
+    white-space: normal;
+  }
+
+  .message-permission-choice .arco-radio-mask-wrapper {
+    flex: 0 0 auto;
+    margin-top: 2px;
+  }
+
+  .message-permission-choice .arco-radio-text {
+    min-width: 0;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+
+  .message-permission-confirm-row {
+    width: 100%;
+    padding-left: 0 !important;
+  }
+
+  .message-permission-confirm-button {
+    width: 100%;
+    min-height: 40px;
+  }
 }

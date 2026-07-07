@@ -56,7 +56,12 @@ const MessagePermission: React.FC<MessagePermissionProps> = React.memo(({ messag
   };
 
   return (
-    <Card className='mb-4' bordered={false} style={{ background: 'var(--bg-1)' }} data-testid='message-permission-card'>
+    <Card
+      className='mb-4 message-permission-card'
+      bordered={false}
+      style={{ background: 'var(--bg-1)' }}
+      data-testid='message-permission-card'
+    >
       <div className='space-y-4'>
         <div className='flex items-center space-x-2'>
           <span className='text-2xl'>{icon}</span>
@@ -76,10 +81,17 @@ const MessagePermission: React.FC<MessagePermissionProps> = React.memo(({ messag
         {!hasResponded && (
           <>
             <div className='mt-10px'>{t('messages.chooseAction')}</div>
-            <Radio.Group direction='vertical' size='mini' value={selected} onChange={setSelected}>
+            <Radio.Group
+              className='message-permission-choice-list'
+              direction='vertical'
+              size='mini'
+              value={selected}
+              onChange={setSelected}
+            >
               {options.length > 0 ? (
                 options.map((option, index) => (
                   <div
+                    className='message-permission-choice'
                     key={String(option.value) || `option_${index}`}
                     data-testid={`message-permission-option-${String(option.value) || `option_${index}`}`}
                   >
@@ -92,8 +104,9 @@ const MessagePermission: React.FC<MessagePermissionProps> = React.memo(({ messag
                 <Text type='secondary'>{t('messages.noOptionsAvailable')}</Text>
               )}
             </Radio.Group>
-            <div className='flex justify-start pl-20px'>
+            <div className='message-permission-confirm-row flex justify-start pl-20px'>
               <Button
+                className='message-permission-confirm-button'
                 type='primary'
                 size='mini'
                 disabled={!selected || isResponding}

@@ -78,7 +78,7 @@ const MessageAcpPermission: React.FC<MessageAcpPermissionProps> = React.memo(({ 
 
   return (
     <Card
-      className='mb-4'
+      className='mb-4 message-permission-card message-acp-permission-card'
       bordered={false}
       style={{ background: 'var(--bg-1)' }}
       data-testid='message-acp-permission-card'
@@ -100,13 +100,23 @@ const MessageAcpPermission: React.FC<MessageAcpPermissionProps> = React.memo(({ 
         {!hasResponded && (
           <>
             <div className='mt-10px'>{t('messages.chooseAction')}</div>
-            <Radio.Group direction='vertical' size='mini' value={selected} onChange={setSelected}>
+            <Radio.Group
+              className='message-permission-choice-list'
+              direction='vertical'
+              size='mini'
+              value={selected}
+              onChange={setSelected}
+            >
               {options && options.length > 0 ? (
                 options.map((option, index) => {
                   const optionName = option?.name || `${t('messages.option')} ${index + 1}`;
                   const option_id = option?.option_id || `option_${index}`;
                   return (
-                    <div key={option_id} data-testid={`message-acp-permission-option-${option_id}`}>
+                    <div
+                      className='message-permission-choice'
+                      key={option_id}
+                      data-testid={`message-acp-permission-option-${option_id}`}
+                    >
                       <Radio value={option_id}>{optionName}</Radio>
                     </div>
                   );
@@ -115,8 +125,9 @@ const MessageAcpPermission: React.FC<MessageAcpPermissionProps> = React.memo(({ 
                 <Text type='secondary'>{t('messages.noOptionsAvailable')}</Text>
               )}
             </Radio.Group>
-            <div className='flex justify-start pl-20px'>
+            <div className='message-permission-confirm-row flex justify-start pl-20px'>
               <Button
+                className='message-permission-confirm-button'
                 type='primary'
                 size='mini'
                 disabled={!selected || isResponding}
