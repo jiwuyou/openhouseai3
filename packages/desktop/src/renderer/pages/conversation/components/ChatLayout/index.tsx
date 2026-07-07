@@ -12,6 +12,7 @@ import { useTitleRename } from '@/renderer/pages/conversation/hooks/useTitleRena
 import { useWorkspaceCollapse } from '@/renderer/pages/conversation/hooks/useWorkspaceCollapse';
 import { PreviewPanel, usePreviewContext } from '@/renderer/pages/conversation/Preview';
 import { dispatchWorkspaceToggleEvent } from '@/renderer/utils/workspace/workspaceEvents';
+import { brandDisplayText } from '@/renderer/utils/brand';
 import classNames from 'classnames';
 import { isMacEnvironment, isWindowsEnvironment } from '@/renderer/pages/conversation/utils/detectPlatform';
 import {
@@ -93,7 +94,7 @@ const ChatLayout: React.FC<{
   const capitalizedBackend = backend ? backend.charAt(0).toUpperCase() + backend.slice(1) : backend;
 
   // Compute display name with fallback chain
-  const display_name = presetAssistant?.name || agent_name || capitalizedBackend;
+  const display_name = brandDisplayText(presetAssistant?.name || agent_name || capitalizedBackend);
 
   const {
     splitRatio: workspaceWidthPxPref,

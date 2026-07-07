@@ -13,6 +13,7 @@ import { ensureAdminPassword } from './ensureAdminPassword.js';
 //   ├── aionui-web              ← bun-compiled standalone binary (process.execPath)
 //   ├── package.json             ← for runtime version lookup
 //   ├── bundled-aioncore/<plat-arch>/aioncore[.exe]
+//   ├── openhouseai-builtin-assistants/
 //   └── static/                  ← SPA assets
 //
 // Under `bun build --compile`, import.meta.url resolves to a virtual /$bunfs/
@@ -52,6 +53,7 @@ const isPackaged = (() => {
 const BACKEND_BINARY = process.platform === 'win32' ? 'aioncore.exe' : 'aioncore';
 const DEFAULT_PORT = 25808;
 const RESET_COMMAND = isPackaged ? 'aionui-web resetpass' : 'bun run resetpass';
+const OPENHOUSEAI_BUILTIN_ASSISTANTS_DIR = 'openhouseai-builtin-assistants';
 
 let currentHandle: WebHostHandle | StaticServerHandle | null = null;
 
@@ -105,6 +107,20 @@ function resolveLogDir(flags: Map<string, string | true>, dataDir: string): stri
   return path.join(dataDir, 'logs');
 }
 
+function configureBuiltinAssistantsPath(): string | undefined {
+  if (process.env.AIONUI_BUILTIN_ASSISTANTS_PATH) {
+    return process.env.AIONUI_BUILTIN_ASSISTANTS_PATH;
+  }
+
+  const candidate = path.join(cliRoot, OPENHOUSEAI_BUILTIN_ASSISTANTS_DIR);
+  if (!fs.existsSync(path.join(candidate, 'assistants.json'))) {
+    return undefined;
+  }
+
+  process.env.AIONUI_BUILTIN_ASSISTANTS_PATH = candidate;
+  return candidate;
+}
+
 function resolvePort(flags: Map<string, string | true>): number {
   const cli = flags.get('port');
   if (typeof cli === 'string' && /^\d+$/.test(cli)) return Number(cli);
@@ -140,6 +156,7 @@ async function runStart(flags: Map<string, string | true>): Promise<void> {
   const port = resolvePort(flags);
   const allowRemote = resolveAllowRemote(flags);
   const version = readPackageVersion();
+  const builtinAssistantsPath = configureBuiltinAssistantsPath();
   const autoOpenBrowser = shouldAutoOpenBrowser({
     allowRemote,
     env: process.env,
@@ -158,6 +175,7 @@ async function runStart(flags: Map<string, string | true>): Promise<void> {
   console.log(`[aionui-web] log dir    : ${logDir}`);
   console.log(`[aionui-web] static dir : ${staticDir}`);
   console.log(`[aionui-web] backend bin: ${backendBin}`);
+  if (builtinAssistantsPath) console.log(`[aionui-web] assistants : ${builtinAssistantsPath}`);
   console.log(`[aionui-web] launching  : port=${port} allowRemote=${allowRemote}`);
 
   const backendAvailable = fs.existsSync(backendBin);
@@ -288,6 +306,7 @@ async function runResetPassword(flags: Map<string, string | true>): Promise<void
   fs.mkdirSync(logDir, { recursive: true });
   const staticDir = resolveStaticDir(flags);
   const version = readPackageVersion();
+  configureBuiltinAssistantsPath();
 
   console.log(`[aionui-web] resetting admin password in ${dataDir}`);
 

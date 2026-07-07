@@ -14,6 +14,7 @@ import { useManagedAgents } from '@/renderer/hooks/agent/useManagedAgents';
 import { formatManagedAgentDiagnosticMessage } from '@/renderer/utils/model/agentTypes';
 import AgentRepairPanel from './AgentRepairPanel';
 import { BoundAssistantList, getBoundAssistants, useAssistantsForAgents } from './BoundAssistants';
+import { brandDisplayText } from '@/renderer/utils/brand';
 
 const OPEN_ASSISTANT_EDITOR_INTENT_KEY = 'guid.openAssistantEditorIntent';
 
@@ -39,19 +40,19 @@ const AgentRepairPage: React.FC = () => {
       setIsTesting(true);
       const result = await ipcBridge.acpConversation.checkManagedAgentHealthById.invoke({ id: agent.id });
       await refreshCatalog();
-      switch (result.status) {
-        case 'online':
-          Message.success(t('settings.agentManagement.testConnectionOnline', { name: result.name }));
+        switch (result.status) {
+          case 'online':
+          Message.success(t('settings.agentManagement.testConnectionOnline', { name: brandDisplayText(result.name) }));
           break;
         case 'missing':
-          Message.warning(t('settings.agentManagement.testConnectionMissing', { name: result.name }));
+          Message.warning(t('settings.agentManagement.testConnectionMissing', { name: brandDisplayText(result.name) }));
           break;
         case 'offline':
           Message.warning(
             formatManagedAgentDiagnosticMessage(t, result) ||
               (result.last_check_error_code === 'auth_required'
-                ? t('settings.agentManagement.testConnectionAuth', { name: result.name })
-                : t('settings.agentManagement.testConnectionOffline', { name: result.name }))
+                ? t('settings.agentManagement.testConnectionAuth', { name: brandDisplayText(result.name) })
+                : t('settings.agentManagement.testConnectionOffline', { name: brandDisplayText(result.name) }))
           );
           break;
         default:
@@ -96,6 +97,7 @@ const AgentRepairPage: React.FC = () => {
   };
 
   const boundAssistants = getBoundAssistants(agent, assistants);
+  const agentDisplayName = brandDisplayText(agent.name);
 
   return (
     <div data-testid='agent-repair-page' className='flex h-full min-h-0 flex-col overflow-hidden bg-transparent'>
@@ -113,7 +115,7 @@ const AgentRepairPage: React.FC = () => {
           >
             {t('common.goBack', { defaultValue: 'Back' })}
           </Button>
-          <div className='truncate text-14px font-600 text-t-primary'>{agent.name}</div>
+          <div className='truncate text-14px font-600 text-t-primary'>{agentDisplayName}</div>
         </div>
         <Button
           type='outline'

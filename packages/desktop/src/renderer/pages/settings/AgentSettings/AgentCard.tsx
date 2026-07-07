@@ -16,6 +16,7 @@ import {
   formatManagedAgentDiagnosticMessage,
 } from '@/renderer/utils/model/agentTypes';
 import { BoundAssistantStack } from './BoundAssistants';
+import { brandDisplayText } from '@/renderer/utils/brand';
 
 type AgentCardProps =
   | {
@@ -109,6 +110,7 @@ const AgentCard: React.FC<AgentCardProps> = (props) => {
   const isDisabled = isCustom && agent.enabled === false;
   const diagnostics = formatManagedAgentDiagnosticMessage(t, agent);
   const displayStatus = resolveDisplayStatus(agent.status, agent.last_check_error_code);
+  const agentDisplayName = brandDisplayText(agent.name);
 
   const avatar = resolveAgentAvatar(logos, {
     icon: agent.avatar || agent.icon,
@@ -132,7 +134,7 @@ const AgentCard: React.FC<AgentCardProps> = (props) => {
           style={{ flexShrink: 0, backgroundColor: avatar.kind === 'image' ? 'transparent' : 'var(--color-fill-2)' }}
         >
           {avatar.kind === 'image' ? (
-            <img src={avatar.value} alt={agent.name} className='h-full w-full object-contain' />
+            <img src={avatar.value} alt={agentDisplayName} className='h-full w-full object-contain' />
           ) : avatar.kind === 'emoji' ? (
             <span className='text-18px leading-none'>{avatar.value}</span>
           ) : (
@@ -141,7 +143,9 @@ const AgentCard: React.FC<AgentCardProps> = (props) => {
         </Avatar>
         <div className='min-w-0 flex-1'>
           <div className='flex min-w-0 items-center gap-8px'>
-            <Typography.Text className='truncate text-14px font-medium text-t-primary'>{agent.name}</Typography.Text>
+            <Typography.Text className='truncate text-14px font-medium text-t-primary'>
+              {agentDisplayName}
+            </Typography.Text>
             <Tag
               data-testid={`agent-row-status-${agent.id}`}
               size='small'

@@ -11,6 +11,7 @@ import type {
 import { ensureBackendMcpCatalog } from '@/renderer/hooks/mcp/catalog';
 import { getSkillImportErrorMessage } from '@/renderer/pages/settings/skillImportMessages';
 import { emitter } from '@/renderer/utils/emitter';
+import { brandDisplayText } from '@/renderer/utils/brand';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { mutate as swrMutate } from 'swr';
@@ -147,19 +148,23 @@ export const useAssistantEditor = ({
         if (cancelled) return;
 
         setEditName(
-          resolveLocalizedProfileField(
-            detail.profile.name,
-            detail.profile.name_i18n,
-            localeKey,
-            activeAssistant.name_i18n?.[localeKey] || activeAssistant.name || ''
+          brandDisplayText(
+            resolveLocalizedProfileField(
+              detail.profile.name,
+              detail.profile.name_i18n,
+              localeKey,
+              activeAssistant.name_i18n?.[localeKey] || activeAssistant.name || ''
+            )
           )
         );
         setEditDescription(
-          resolveLocalizedProfileField(
-            detail.profile.description,
-            detail.profile.description_i18n,
-            localeKey,
-            activeAssistant.description_i18n?.[localeKey] || activeAssistant.description || ''
+          brandDisplayText(
+            resolveLocalizedProfileField(
+              detail.profile.description,
+              detail.profile.description_i18n,
+              localeKey,
+              activeAssistant.description_i18n?.[localeKey] || activeAssistant.description || ''
+            )
           )
         );
         setEditContext(detail.rules.content || '');
@@ -222,8 +227,8 @@ export const useAssistantEditor = ({
     setActiveAssistantId(assistant.id);
     setEditVisible(true);
     setPromptViewMode(isBuiltinAssistant(assistant) ? 'preview' : 'edit');
-    setEditName(assistant.name || '');
-    setEditDescription(assistant.description || '');
+    setEditName(brandDisplayText(assistant.name || ''));
+    setEditDescription(brandDisplayText(assistant.description || ''));
     setEditAvatar(assistant.avatar || '');
     setEditAvatarPreview(undefined);
     setEditAgent(assistant.agent_id || '');
@@ -233,14 +238,18 @@ export const useAssistantEditor = ({
     try {
       const { detail, skillsList, autoSkills, mcpServers } = await loadEditorResources(assistant.id);
       setEditName(
-        resolveLocalizedProfileField(detail.profile.name, detail.profile.name_i18n, localeKey, assistant.name || '')
+        brandDisplayText(
+          resolveLocalizedProfileField(detail.profile.name, detail.profile.name_i18n, localeKey, assistant.name || '')
+        )
       );
       setEditDescription(
-        resolveLocalizedProfileField(
-          detail.profile.description,
-          detail.profile.description_i18n,
-          localeKey,
-          assistant.description || ''
+        brandDisplayText(
+          resolveLocalizedProfileField(
+            detail.profile.description,
+            detail.profile.description_i18n,
+            localeKey,
+            assistant.description || ''
+          )
         )
       );
       setEditAvatar(detail.profile.avatar || '');
@@ -309,8 +318,8 @@ export const useAssistantEditor = ({
     setActiveAssistantId(null);
     setEditVisible(true);
     setPromptViewMode('edit');
-    setEditName(`${assistant.name_i18n?.[localeKey] || assistant.name} (Copy)`);
-    setEditDescription(assistant.description_i18n?.[localeKey] || assistant.description || '');
+    setEditName(`${brandDisplayText(assistant.name_i18n?.[localeKey] || assistant.name)} (Copy)`);
+    setEditDescription(brandDisplayText(assistant.description_i18n?.[localeKey] || assistant.description || ''));
     setEditAvatar(assistant.avatar || '\u{1F916}');
     setEditAvatarPreview(undefined);
     setEditAgent(assistant.agent_id || '');

@@ -11,6 +11,7 @@ import { configService } from '@/common/config/configService';
 import AionModal from '@/renderer/components/base/AionModal';
 import AionScrollArea from '@/renderer/components/base/AionScrollArea';
 import { useTalkToButler } from '@/renderer/hooks/assistant/useTalkToButler';
+import { APP_BRAND_NAME } from '@/renderer/utils/brand';
 import ChannelDingTalkLogo from '@/renderer/assets/channel-logos/dingtalk.svg';
 import ChannelDiscordLogo from '@/renderer/assets/channel-logos/discord.svg';
 import ChannelLarkLogo from '@/renderer/assets/channel-logos/lark.svg';
@@ -667,8 +668,7 @@ const WebuiModalContent: React.FC = () => {
                   onClick={() =>
                     void talkToButler({
                       prompt: t('settings.talkToButler.prompt.setupRemote', {
-                        defaultValue:
-                          'Help me set up remote access so I can open AionUi from my phone or over the internet.',
+                        defaultValue: `Help me set up remote access so I can open ${APP_BRAND_NAME} from my phone or over the internet.`,
                       }),
                     })
                   }
