@@ -131,9 +131,17 @@ function resolvePort(flags: Map<string, string | true>): number {
 
 function resolveAllowRemote(flags: Map<string, string | true>): boolean {
   if (flags.has('remote')) return true;
+  const host = resolveHost(flags);
+  if (host && !['127.0.0.1', 'localhost', '::1'].includes(host)) return true;
   const env = process.env.AIONUI_ALLOW_REMOTE ?? process.env.AIONUI_REMOTE;
   if (!env) return false;
   return ['1', 'true', 'yes', 'on'].includes(env.trim().toLowerCase());
+}
+
+function resolveHost(flags: Map<string, string | true>): string | undefined {
+  const cli = flags.get('host');
+  const host = (typeof cli === 'string' ? cli : undefined) ?? process.env.AIONUI_HOST;
+  return host?.trim() || undefined;
 }
 
 function readPackageVersion(): string {
@@ -154,6 +162,7 @@ async function runStart(flags: Map<string, string | true>): Promise<void> {
   const logDir = resolveLogDir(flags, dataDir);
   fs.mkdirSync(logDir, { recursive: true });
   const port = resolvePort(flags);
+  const host = resolveHost(flags);
   const allowRemote = resolveAllowRemote(flags);
   const version = readPackageVersion();
   const builtinAssistantsPath = configureBuiltinAssistantsPath();
@@ -176,7 +185,7 @@ async function runStart(flags: Map<string, string | true>): Promise<void> {
   console.log(`[aionui-web] static dir : ${staticDir}`);
   console.log(`[aionui-web] backend bin: ${backendBin}`);
   if (builtinAssistantsPath) console.log(`[aionui-web] assistants : ${builtinAssistantsPath}`);
-  console.log(`[aionui-web] launching  : port=${port} allowRemote=${allowRemote}`);
+  console.log(`[aionui-web] launching  : port=${port} host=${host ?? '(auto)'} allowRemote=${allowRemote}`);
 
   const backendAvailable = fs.existsSync(backendBin);
 
@@ -195,6 +204,7 @@ async function runStart(flags: Map<string, string | true>): Promise<void> {
       staticDir,
       backendPort: 0, // invalid port → API proxy will fail cleanly
       port,
+      host,
       allowRemote,
     });
     currentHandle = handle;
@@ -223,6 +233,7 @@ async function runStart(flags: Map<string, string | true>): Promise<void> {
       },
       staticDir,
       port,
+      host,
       allowRemote,
       dataDir,
       logDir,

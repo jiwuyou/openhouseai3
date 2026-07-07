@@ -19,6 +19,7 @@ export type StaticServerOptions = {
   staticDir: string;
   backendPort: number;
   port?: number;
+  host?: string;
   allowRemote?: boolean;
 };
 
@@ -41,6 +42,18 @@ function getLanIP(): string | null {
     }
   }
   return null;
+}
+
+function isAnyHost(host: string): boolean {
+  return host === '0.0.0.0' || host === '::' || host === '::0';
+}
+
+function isLoopbackHost(host: string): boolean {
+  return host === '127.0.0.1' || host === 'localhost' || host === '::1';
+}
+
+function formatUrlHost(host: string): string {
+  return host.includes(':') && !host.startsWith('[') ? `[${host}]` : host;
 }
 
 function forwardToBackend(req: IncomingMessage, res: ServerResponse, backendPort: number): void {
@@ -120,7 +133,7 @@ function peekWsRoute(buf: Buffer): boolean | null {
 export async function startStaticServer(opts: StaticServerOptions): Promise<StaticServerHandle> {
   const port = opts.port ?? DEFAULT_PORT;
   const allowRemote = opts.allowRemote === true;
-  const host = allowRemote ? '0.0.0.0' : '127.0.0.1';
+  const host = opts.host?.trim() || (allowRemote ? '0.0.0.0' : '127.0.0.1');
 
   // The HTTP server listens only on loopback — user traffic hits the outer
   // net.Server first. We route to this server for everything except WS
@@ -151,7 +164,7 @@ export async function startStaticServer(opts: StaticServerOptions): Promise<Stat
         public: opts.staticDir,
         rewrites: [{ source: '**', destination: '/index.html' }],
       });
-    } catch (err) {
+    } catch {
       if (!res.headersSent) {
         res.writeHead(500, { 'content-type': 'application/json' });
         res.end(JSON.stringify({ error: 'INTERNAL_ERROR' }));
@@ -219,9 +232,13 @@ export async function startStaticServer(opts: StaticServerOptions): Promise<Stat
   });
 
   const actualPort = (tcp_server.address() as { port: number } | null)?.port ?? port;
-  const lanIP = allowRemote ? (getLanIP() ?? undefined) : undefined;
-  const localUrl = `http://127.0.0.1:${actualPort}`;
-  const networkUrl = lanIP ? `http://${lanIP}:${actualPort}` : undefined;
+  const advertisedHost = isAnyHost(host) ? (allowRemote ? (getLanIP() ?? undefined) : undefined) : host;
+  const lanIP = advertisedHost && !isLoopbackHost(advertisedHost) ? advertisedHost : undefined;
+  const localUrl =
+    isLoopbackHost(host) || isAnyHost(host)
+      ? `http://127.0.0.1:${actualPort}`
+      : `http://${formatUrlHost(host)}:${actualPort}`;
+  const networkUrl = lanIP ? `http://${formatUrlHost(lanIP)}:${actualPort}` : undefined;
 
   return {
     port: actualPort,

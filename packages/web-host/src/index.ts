@@ -55,6 +55,7 @@ export async function startWebHost(opts: WebHostOptions): Promise<WebHostHandle>
       staticDir: opts.staticDir,
       backendPort: backendHandle.port,
       port: opts.port,
+      host: opts.host,
       allowRemote: opts.allowRemote ?? false,
     });
   } catch (err) {
