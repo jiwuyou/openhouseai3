@@ -109,7 +109,7 @@ function resolvePort(): number {
 
 function resolveAllowRemote(): boolean {
   if (has('--remote')) return true;
-  const host = process.env.AIONUI_HOST?.trim();
+  const host = resolveHost();
   if (host && ['0.0.0.0', '::', '::0'].includes(host)) return true;
   if (host && !['127.0.0.1', 'localhost', '::1'].includes(host)) return true;
   return parseBoolean(process.env.AIONUI_ALLOW_REMOTE ?? process.env.AIONUI_REMOTE);
