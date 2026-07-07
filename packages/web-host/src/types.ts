@@ -34,6 +34,7 @@ export type WebHostOptions = {
   app: AppMetadata;
   staticDir: string;
   port?: number;
+  host?: string;
   allowRemote?: boolean;
   dataDir?: string;
   logDir?: string;

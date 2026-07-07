@@ -111,7 +111,14 @@ function resolveAllowRemote(): boolean {
   if (has('--remote')) return true;
   const host = process.env.AIONUI_HOST?.trim();
   if (host && ['0.0.0.0', '::', '::0'].includes(host)) return true;
+  if (host && !['127.0.0.1', 'localhost', '::1'].includes(host)) return true;
   return parseBoolean(process.env.AIONUI_ALLOW_REMOTE ?? process.env.AIONUI_REMOTE);
+}
+
+function resolveHost(): string | undefined {
+  const cli = getFlag('--host');
+  const host = cli ?? process.env.AIONUI_HOST;
+  return host?.trim() || undefined;
 }
 
 function resolveStaticDir(): string {
@@ -219,6 +226,7 @@ async function main(): Promise<void> {
   augmentPathWithNvm();
   runPackageIfNeeded();
   const port = resolvePort();
+  const host = resolveHost();
   const allowRemote = resolveAllowRemote();
   const autoOpenBrowser = shouldAutoOpenBrowser({
     allowRemote,
@@ -239,7 +247,7 @@ async function main(): Promise<void> {
   console.log('[webui] static dir :', staticDir);
   console.log('[webui] backend bin:', backendBin);
   if (builtinAssistantsPath) console.log('[webui] assistants :', builtinAssistantsPath);
-  console.log(`[webui] launching  : port=${port} allowRemote=${allowRemote}`);
+  console.log(`[webui] launching  : port=${port} host=${host ?? '(auto)'} allowRemote=${allowRemote}`);
 
   const handle = await startWebHost({
     app: {
@@ -250,6 +258,7 @@ async function main(): Promise<void> {
     },
     staticDir,
     port,
+    host,
     allowRemote,
     dataDir: workDir,
     logDir,
