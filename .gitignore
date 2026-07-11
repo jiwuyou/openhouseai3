@@ -132,6 +132,7 @@ Thumbs.db
 
 # Build and output directories
 dist/
+dist-web-cli/
 build/
 out/
 out-fast-builds/
